@@ -1,0 +1,33 @@
+grammar fm.Limboole with org.eclipse.xtext.common.Terminals
+
+generate limboole "http://www.Limboole.fm"
+
+Expr:
+	Iff;
+
+Iff returns Expr:
+	Implies ({Iff.left=current} '<->' right=Implies)*;
+
+Implies returns Expr:
+	Or (('->' | '<-') {Implies.left=current} right=Or)?;
+	
+Or returns Expr:
+	And ({Or.left=current} '|' right=And)*;
+
+And returns Expr:
+	Not ({And.left=current} '&' right=Not)*;
+	
+Not returns Expr:
+	Basic 
+	| '!' Not;
+		
+Basic returns Expr:
+	var=VAR
+	| '(' Expr ')';
+
+@Override
+terminal SL_COMMENT : '%' !('\n'|'\r')* ('\r'? '\n')?;
+
+terminal VAR: ('a'..'z'|'A'..'Z'|'_'|'-'|'.'|'['|']'|'$'|'@'|'0'..'9')* ('a'..'z'|'A'..'Z'|'_'|'.'|'['|']'|'$'|'@'|'0'..'9');
+
+
